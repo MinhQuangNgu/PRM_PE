@@ -123,7 +123,7 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="39dp"
         android:background="@drawable/greenbuttongradient"
-        android:text="Save update"
+        android:text="Create New"
         android:textColor="@color/white"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

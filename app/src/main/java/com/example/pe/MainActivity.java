@@ -4,7 +4,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 
 import com.example.pe.entity.Contact;
 
@@ -27,5 +29,13 @@ public class MainActivity extends AppCompatActivity {
         RecyclerView rec = findViewById(R.id.rec_list);
         rec.setLayoutManager(new LinearLayoutManager(this));
         rec.setAdapter(new ContactCardAdapter(contacts));
+
+        findViewById(R.id.btn_add).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this,AddContactActivity.class);
+                startActivity(intent);
+            }
+        });
     }
 }
