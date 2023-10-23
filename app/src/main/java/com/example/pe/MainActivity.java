@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.view.View;
 
 import com.example.pe.entity.Contact;
+import com.example.pe.helpers.FirebaseDatabaseHelper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,5 +38,10 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+
+        final FirebaseDatabaseHelper dbHelper = new FirebaseDatabaseHelper();
+        Contact newContact = new Contact(1, "Cong", "Nguyen", "nguyencong@gmail.com", "FPT", "0123456789", "FPTU", "https://i.pinimg.com/474x/f1/8a/e9/f18ae9cf47240876a977e6071db7f1f2.jpg");
+        dbHelper.addContact(newContact);
+
     }
 }
