@@ -1,6 +1,9 @@
 package com.example.pe.helpers;
 
+import androidx.annotation.NonNull;
 import com.example.pe.entity.Contact;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -54,5 +57,27 @@ public class FirebaseDatabaseHelper {
         void onContactFetched(Contact contact);
         void onContactNotFound();
         void onContactFetchError(String errorMessage);
+    }
+
+    public void clearAllContacts(final OnContactsClearedListener listener) {
+        DatabaseReference contactsRef = databaseReference.child("contacts");
+        contactsRef.removeValue()
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        listener.onContactsCleared();
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        listener.onContactsClearError(e.getMessage());
+                    }
+                });
+    }
+
+    public interface OnContactsClearedListener {
+        void onContactsCleared();
+        void onContactsClearError(String errorMessage);
     }
 }
