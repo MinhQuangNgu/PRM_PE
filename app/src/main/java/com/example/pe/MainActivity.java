@@ -21,20 +21,27 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         mContactManager = new ContactManager(this);
-        List<Contact> contacts = new ArrayList<Contact>();
-        contacts = mContactManager.getListContact();
-        Contact contact = new Contact(55,"Minh","Quang","Quangnm","099999999","sdds");
-        Contact contact2 = new Contact(56,"Minh2","Quang2","Quangnm2","099999999","sdds");
-        contacts.add(contact);
-        contacts.add(contact2);
-//        contacts.addAll(mContactManager.getListContact());
+        List<Contact> contacts = mContactManager.getListContact();
         for (Contact c:contacts) {
             Log.d("contactCheck", "onCreate: "+c.toString());
         }
         RecyclerView rec = findViewById(R.id.rec_list);
         rec.setLayoutManager(new LinearLayoutManager(this));
         rec.setAdapter(new ContactCardAdapter(contacts));
+
+        final FirebaseDatabaseHelper dbHelper = new FirebaseDatabaseHelper();
+        dbHelper.uploadAllContacts(contacts, new FirebaseDatabaseHelper.OnContactsUploadedListener() {
+            @Override
+            public void onContactsUploaded() {
+                Log.d("FirebaseLoad", "Contacts load successfully");
+            }
+            @Override
+            public void onUploadError(String errorMessage) {
+                Log.e("FirebaseLoadError", errorMessage);
+            }
+        });
 
         findViewById(R.id.btn_add).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -43,10 +50,5 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
-
-        final FirebaseDatabaseHelper dbHelper = new FirebaseDatabaseHelper();
-        Contact newContact = new Contact(1, "Cong", "Nguyen", "nguyencong@gmail.com", "FPT", "0123456789", "FPTU", "https://i.pinimg.com/474x/f1/8a/e9/f18ae9cf47240876a977e6071db7f1f2.jpg");
-        dbHelper.addContact(newContact);
-
     }
 }
