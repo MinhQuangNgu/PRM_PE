@@ -6,6 +6,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 
 import com.example.pe.entity.Contact;
@@ -15,18 +16,22 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
-
+    private ContactManager mContactManager;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        mContactManager = new ContactManager(this);
         List<Contact> contacts = new ArrayList<Contact>();
-
-        Contact contact = new Contact(1,"Minh","Quang","Quangnm","099999999","sdds");
-
+        contacts = mContactManager.getListContact();
+        Contact contact = new Contact(55,"Minh","Quang","Quangnm","099999999","sdds");
+        Contact contact2 = new Contact(56,"Minh2","Quang2","Quangnm2","099999999","sdds");
         contacts.add(contact);
-
+        contacts.add(contact2);
+//        contacts.addAll(mContactManager.getListContact());
+        for (Contact c:contacts) {
+            Log.d("contactCheck", "onCreate: "+c.toString());
+        }
         RecyclerView rec = findViewById(R.id.rec_list);
         rec.setLayoutManager(new LinearLayoutManager(this));
         rec.setAdapter(new ContactCardAdapter(contacts));
