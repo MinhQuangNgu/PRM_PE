@@ -32,4 +32,18 @@ public class Contact {
         this.phone = phone;
         this.imageUri = imageUri;
     }
+
+    @Override
+    public String toString() {
+        return "Contact{" +
+                "id=" + id +
+                ", firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
+                ", email='" + email + '\'' +
+                ", address='" + address + '\'' +
+                ", phone='" + phone + '\'' +
+                ", company='" + company + '\'' +
+                ", imageUri='" + imageUri + '\'' +
+                '}';
+    }
 }
