@@ -2,6 +2,8 @@ package com.example.pe;
 
 import androidx.appcompat.app.AppCompatActivity;
 import android.content.ContentProviderOperation;
+import android.content.ContentProviderResult;
+import android.content.ContentUris;
 import android.content.OperationApplicationException;
 import android.os.Bundle;
 import android.os.RemoteException;
@@ -59,6 +61,7 @@ public class AddContactActivity extends AppCompatActivity {
     }
 
     private void addContact(String firstName, String lastName, String email, String company, String phone, String address) {
+        int contactId = -1;
         ArrayList<ContentProviderOperation> ops = new ArrayList<>();
 
         // Create a new raw contact
@@ -106,9 +109,13 @@ public class AddContactActivity extends AppCompatActivity {
                 .build());
 
         try {
-            getContentResolver().applyBatch(ContactsContract.AUTHORITY, ops);
+            ContentProviderResult[] results = getContentResolver().applyBatch(ContactsContract.AUTHORITY, ops);
+            if (results.length > 0) {
+                contactId = (int) ContentUris.parseId(results[0].uri); // Get the contact ID
+            }
+            //add to firebase
             final FirebaseDatabaseHelper dbHelper = new FirebaseDatabaseHelper();
-            Contact newContact = new Contact(1, "Cong", "Nguyen", "nguyencong@gmail.com", "FPT", "0123456789", "FPTU", "https://i.pinimg.com/474x/f1/8a/e9/f18ae9cf47240876a977e6071db7f1f2.jpg");
+            Contact newContact = new Contact(contactId, firstName, lastName, email, address, phone, company, "https://i.pinimg.com/474x/f1/8a/e9/f18ae9cf47240876a977e6071db7f1f2.jpg");
             dbHelper.addContact(newContact);
             Toast.makeText(this, "Contact added to phone book", Toast.LENGTH_SHORT).show();
         } catch (RemoteException | OperationApplicationException e) {
