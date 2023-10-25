@@ -7,6 +7,8 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.List;
+
 public class FirebaseDatabaseHelper {
     private DatabaseReference databaseReference;
 
@@ -55,4 +57,58 @@ public class FirebaseDatabaseHelper {
         void onContactNotFound();
         void onContactFetchError(String errorMessage);
     }
+
+    public void addAllContacts(List<Contact> contacts, final OnContactsAddedListener listener) {
+        for (Contact contact : contacts) {
+            addContact(contact);
+        }
+        listener.onContactsAdded();
+    }
+
+    public interface OnContactsAddedListener {
+        void onContactsAdded();
+    }
+
+    public void uploadAllContacts(final List<Contact> contacts, final OnContactsUploadedListener listener) {
+        deleteAllContacts(new OnContactsDeletedListener() {
+            @Override
+            public void onContactsDeleted() {
+                for (Contact contact : contacts) {
+                    addContact(contact);
+                }
+                listener.onContactsUploaded();
+            }
+
+            @Override
+            public void onDeleteError(String errorMessage) {
+                listener.onUploadError(errorMessage);
+            }
+        });
+    }
+
+    public interface OnContactsUploadedListener {
+        void onContactsUploaded();
+        void onUploadError(String errorMessage);
+    }
+
+    public void deleteAllContacts(final OnContactsDeletedListener listener) {
+        databaseReference.child("contacts").removeValue(new DatabaseReference.CompletionListener() {
+            @Override
+            public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
+                if (databaseError == null) {
+                    listener.onContactsDeleted();
+                } else {
+                    listener.onDeleteError(databaseError.getMessage());
+                }
+            }
+        });
+    }
+
+    public interface OnContactsDeletedListener {
+        void onContactsDeleted();
+        void onDeleteError(String errorMessage);
+    }
+
+
+
 }
