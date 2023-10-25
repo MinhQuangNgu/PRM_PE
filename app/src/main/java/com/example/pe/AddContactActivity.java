@@ -107,8 +107,9 @@ public class AddContactActivity extends AppCompatActivity {
 
         try {
             getContentResolver().applyBatch(ContactsContract.AUTHORITY, ops);
+            //add to firebase
             final FirebaseDatabaseHelper dbHelper = new FirebaseDatabaseHelper();
-            Contact newContact = new Contact(1, "Cong", "Nguyen", "nguyencong@gmail.com", "FPT", "0123456789", "FPTU", "https://i.pinimg.com/474x/f1/8a/e9/f18ae9cf47240876a977e6071db7f1f2.jpg");
+            Contact newContact = new Contact(Integer.parseInt(phone), firstName, lastName, email, address, phone, company, "https://i.pinimg.com/474x/f1/8a/e9/f18ae9cf47240876a977e6071db7f1f2.jpg");
             dbHelper.addContact(newContact);
             Toast.makeText(this, "Contact added to phone book", Toast.LENGTH_SHORT).show();
         } catch (RemoteException | OperationApplicationException e) {
