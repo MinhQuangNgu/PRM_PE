@@ -58,21 +58,53 @@ public class MainActivity extends AppCompatActivity {
         });
 
         String searchText = "Cong";
-        dbHelper.getContactsBySearch(searchText, new FirebaseDatabaseHelper.OnContactsFetchedListener() {
+        dbHelper.getContactsBySearch(searchText, new FirebaseDatabaseHelper.OnContactsBySearchListener() { // gọi hàm get contact by name,email,.. trên firebase
             @Override
-            public void onContactsFetched(List<Contact> contacts) {
+            public void onContactsBySearchFetched(List<Contact> contacts) { // xử lý danh sách contacts lấy được
+                // ở đây sẽ trả về List<Contact> contacts, xử lý vs danh sách contacts trả về như xử lý bình thường...
+                //hiển thị trên màn hình,.... các thứ ở đây
                 for (Contact contact : contacts) {
                     Log.d("Contact", contact.toString());
                 }
             }
 
             @Override
-            public void onContactsFetchError(String errorMessage) {
+            public void onContactsBySearchFetchError(String errorMessage) {
+                // ở đây sẽ xử lý nêu lỗi, không cần làm gì cx đc
                 Log.e("ContactFetchError", errorMessage);
             }
         });
 
+        // tương tự với getbyid
 
+        int contactId = 100;
+        dbHelper.getContactById(contactId, new FirebaseDatabaseHelper.OnContactByIdFetchedListener() { // gọi hàm get contact by id trên firebase
+            @Override
+            public void onContactByIdFetched(Contact contact) { // xử lý contact lấy được
+                //hiển thị trên màn hình,.... các thứ ở đây
+                    Log.d("Contact", contact.toString());
+
+            }
+
+            @Override
+            public void onContactByIdFetchError(String errorMessage) {
+                // ở đây sẽ xử lý nêu lỗi, không cần làm gì cx đc
+                Log.e("ContactFetchError", errorMessage);
+            }
+        });
+
+        //addContact
+
+        Contact newContact = new Contact(103, "Nguyen", "Cong", "nguyen@gmail.com", "FPT", "0123456789", "FPT", "avata.jpg");
+        dbHelper.addContact(newContact);
+
+        //updateContact
+        newContact.firstName = "Hello";
+        dbHelper.updateContact(newContact);
+
+        //deleteContact
+        int contactDelId = 101;
+        dbHelper.deleteContact(contactDelId);
 
         findViewById(R.id.btn_add).setOnClickListener(new View.OnClickListener() {
             @Override
