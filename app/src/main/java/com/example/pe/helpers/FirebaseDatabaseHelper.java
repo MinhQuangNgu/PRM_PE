@@ -7,6 +7,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class FirebaseDatabaseHelper {
@@ -57,6 +58,38 @@ public class FirebaseDatabaseHelper {
         void onContactNotFound();
         void onContactFetchError(String errorMessage);
     }
+
+    public void getContactsBySearch(final String searchText, final OnContactsFetchedListener listener) {
+        databaseReference.child("contacts").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                List<Contact> matchedContacts = new ArrayList<>();
+
+                for (DataSnapshot contactSnapshot : dataSnapshot.getChildren()) {
+                    Contact contact = contactSnapshot.getValue(Contact.class);
+                    if (contact != null &&
+                            (contact.getFirstName().toLowerCase().contains(searchText.toLowerCase()) ||
+                                    contact.getLastName().toLowerCase().contains(searchText.toLowerCase()) ||
+                                    contact.getEmail().toLowerCase().contains(searchText.toLowerCase()))) {
+                        matchedContacts.add(contact);
+                    }
+                }
+
+                listener.onContactsFetched(matchedContacts);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                listener.onContactsFetchError(databaseError.getMessage());
+            }
+        });
+    }
+
+    public interface OnContactsFetchedListener {
+        void onContactsFetched(List<Contact> contacts);
+        void onContactsFetchError(String errorMessage);
+    }
+
 
     public void addAllContacts(List<Contact> contacts, final OnContactsAddedListener listener) {
         for (Contact contact : contacts) {

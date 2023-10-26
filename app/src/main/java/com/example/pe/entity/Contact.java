@@ -46,4 +46,32 @@ public class Contact {
                 ", imageUri='" + imageUri + '\'' +
                 '}';
     }
+
+    public int getId() {
+        return id;
+    }
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public String getImageUri() {
+        return imageUri;
+    }
 }
