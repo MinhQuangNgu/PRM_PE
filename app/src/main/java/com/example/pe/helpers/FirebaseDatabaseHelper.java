@@ -1,5 +1,6 @@
 package com.example.pe.helpers;
 
+import com.example.pe.ContactManager;
 import com.example.pe.entity.Contact;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -12,6 +13,7 @@ import java.util.List;
 
 public class FirebaseDatabaseHelper {
     private DatabaseReference databaseReference;
+    private ContactManager mContactManager;
 
     public FirebaseDatabaseHelper() {
         // Connect Firebase Realtime Database
@@ -30,6 +32,7 @@ public class FirebaseDatabaseHelper {
 
     public void deleteContact(int contactId) {
         databaseReference.child("contacts").child(String.valueOf(contactId)).removeValue();
+        mContactManager.deleteContact(contactId);//xoa tren local
     }
 
     public void getContactById(int contactId, final OnContactByIdFetchedListener listener) {
