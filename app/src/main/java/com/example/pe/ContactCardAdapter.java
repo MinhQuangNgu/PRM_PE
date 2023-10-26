@@ -54,7 +54,7 @@ public class ContactCardAdapter extends RecyclerView.Adapter<ContactCardAdapter.
         holder.btn_edit.setOnClickListener(view -> {
             int contactId = contacts.get(positionTemp).id;
             Intent intent = new Intent(view.getContext(), ContactDetailActivity.class);
-            intent.putExtra("CONTACT_ID", contactId);
+            intent.putExtra("CONTACT_ID", contactId+"");
             view.getContext().startActivity(intent);
         });
     }
