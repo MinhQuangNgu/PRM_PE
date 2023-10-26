@@ -155,5 +155,12 @@ public class ContactManager {
         return null;
     }
 
+    public boolean deleteContact(int contactId) {
+        Uri contactUri = Uri.withAppendedPath(ContactsContract.Contacts.CONTENT_URI, String.valueOf(contactId));
+        int rowsDeleted = mContext.getContentResolver().delete(contactUri, null, null);
+        return rowsDeleted > 0;
+    }
 
+    //Nhet cai nay vao ham delete by id tren firebase la xoa tren local luon nhe :>
+    //mContactManager.deleteContact(idContact);
 }

@@ -1,5 +1,6 @@
 package com.example.pe.helpers;
 
+import com.example.pe.ContactManager;
 import com.example.pe.entity.Contact;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -12,6 +13,7 @@ import java.util.List;
 
 public class FirebaseDatabaseHelper {
     private DatabaseReference databaseReference;
+    private ContactManager mContactManager;
 
     public FirebaseDatabaseHelper() {
         // Connect Firebase Realtime Database
@@ -30,9 +32,10 @@ public class FirebaseDatabaseHelper {
 
     public void deleteContact(int contactId) {
         databaseReference.child("contacts").child(String.valueOf(contactId)).removeValue();
+        mContactManager.deleteContact(contactId);//xoa tren local
     }
 
-    public void getContact(int contactId, final OnContactFetchedListener listener) {
+    public void getContactById(int contactId, final OnContactByIdFetchedListener listener) {
         String contactIdString = String.valueOf(contactId);
         DatabaseReference contactRef = databaseReference.child("contacts").child(contactIdString);
         contactRef.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -40,26 +43,23 @@ public class FirebaseDatabaseHelper {
             public void onDataChange(DataSnapshot dataSnapshot) {
                 Contact contact = dataSnapshot.getValue(Contact.class);
                 if (contact != null) {
-                    listener.onContactFetched(contact);
-                } else {
-                    listener.onContactNotFound();
+                    listener.onContactByIdFetched(contact);
                 }
             }
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-                listener.onContactFetchError(databaseError.getMessage());
+                listener.onContactByIdFetchError(databaseError.getMessage());
             }
         });
     }
 
-    public interface OnContactFetchedListener {
-        void onContactFetched(Contact contact);
-        void onContactNotFound();
-        void onContactFetchError(String errorMessage);
+    public interface OnContactByIdFetchedListener {
+        void onContactByIdFetched(Contact contact);
+        void onContactByIdFetchError(String errorMessage);
     }
 
-    public void getContactsBySearch(final String searchText, final OnContactsFetchedListener listener) {
+    public void getContactsBySearch(final String searchText, final OnContactsBySearchListener listener) {
         databaseReference.child("contacts").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -75,19 +75,19 @@ public class FirebaseDatabaseHelper {
                     }
                 }
 
-                listener.onContactsFetched(matchedContacts);
+                listener.onContactsBySearchFetched(matchedContacts);
             }
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-                listener.onContactsFetchError(databaseError.getMessage());
+                listener.onContactsBySearchFetchError(databaseError.getMessage());
             }
         });
     }
 
-    public interface OnContactsFetchedListener {
-        void onContactsFetched(List<Contact> contacts);
-        void onContactsFetchError(String errorMessage);
+    public interface OnContactsBySearchListener {
+        void onContactsBySearchFetched(List<Contact> contacts);
+        void onContactsBySearchFetchError(String errorMessage);
     }
 
 
