@@ -44,7 +44,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
 
-        // Example
+        // Example: demo all fetch data
 
         // Add contacts
         List<Contact> newContacts = new ArrayList<>();
@@ -82,8 +82,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onContactByIdFetched(Contact contact) { // xử lý contact lấy được
                 //hiển thị trên màn hình,.... các thứ ở đây
-                    Log.d("Contact", contact.toString());
-
+                Log.d("Contact", contact.toString());
             }
 
             @Override
@@ -103,8 +102,8 @@ public class MainActivity extends AppCompatActivity {
         dbHelper.updateContact(newContact);
 
         //deleteContact
-        int contactDelId = 101;
-        dbHelper.deleteContact(contactDelId);
+        //int contactDelId = 101;
+        //dbHelper.deleteContact(contactDelId);
 
         findViewById(R.id.btn_add).setOnClickListener(new View.OnClickListener() {
             @Override
