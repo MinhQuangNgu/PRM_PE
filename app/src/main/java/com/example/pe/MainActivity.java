@@ -17,19 +17,30 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
     private ContactManager mContactManager;
+    List<Contact> contacts = new ArrayList<>();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
         mContactManager = new ContactManager(this);
-        List<Contact> contacts = mContactManager.getListContact();
+        contacts = mContactManager.getListContact();
         for (Contact c:contacts) {
             Log.d("contactCheck", "onCreate: "+c.toString());
         }
         RecyclerView rec = findViewById(R.id.rec_list);
         rec.setLayoutManager(new LinearLayoutManager(this));
-        rec.setAdapter(new ContactCardAdapter(contacts));
+        rec.setAdapter(new ContactCardAdapter(contacts, new ContactCardAdapter.IclickItem() {
+            @Override
+            public void getContact(int id) {
+                Log.d("hehe","Id : "+id);
+//                (new FirebaseDatabaseHelper()).deleteContact(id);
+                mContactManager.deleteContact(id);
+                contacts.clear();
+                contacts.addAll(getFromLocal());
+                rec.getAdapter().notifyDataSetChanged();
+            }
+        }));
 
         final FirebaseDatabaseHelper dbHelper = new FirebaseDatabaseHelper();
         dbHelper.uploadAllContacts(contacts, new FirebaseDatabaseHelper.OnContactsUploadedListener() {
@@ -103,8 +114,8 @@ public class MainActivity extends AppCompatActivity {
         dbHelper.updateContact(newContact);
 
         //deleteContact
-        int contactDelId = 101;
-        dbHelper.deleteContact(contactDelId);
+//        int contactDelId = 101;
+//        dbHelper.deleteContact(contactDelId);
 
         findViewById(R.id.btn_add).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -114,5 +125,8 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+    }
+    public List<Contact> getFromLocal(){
+        return(new ContactManager(this)).getListContact();
     }
 }
