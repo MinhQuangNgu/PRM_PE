@@ -1,6 +1,7 @@
 package com.example.pe;
 
 import android.content.Intent;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,15 +13,21 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.pe.entity.Contact;
+import com.example.pe.helpers.FirebaseDatabaseHelper;
 
 import java.util.List;
 
 public class ContactCardAdapter extends RecyclerView.Adapter<ContactCardAdapter.ContactCardHolder> {
 
     List<Contact> contacts;
+    private IclickItem ilickItem;
 
-    public ContactCardAdapter(List<Contact> contacts){
+    public interface IclickItem{
+        void getContact(int id);
+    }
+    public ContactCardAdapter(List<Contact> contacts , IclickItem iclickItem){
         this.contacts = contacts;
+        this.ilickItem = iclickItem;
     }
     @NonNull
     @Override
@@ -40,7 +47,7 @@ public class ContactCardAdapter extends RecyclerView.Adapter<ContactCardAdapter.
         holder.btn_delete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //Delete tai day
+                ilickItem.getContact(contacts.get(positionTemp).id);
             }
         });
 
