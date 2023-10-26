@@ -139,6 +139,35 @@ public class FirebaseDatabaseHelper {
         void onDeleteError(String errorMessage);
     }
 
+    public void getAllContacts(final OnAllContactsFetchedListener listener) {
+        DatabaseReference contactsRef = databaseReference.child("contacts");
+        contactsRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                List<Contact> allContacts = new ArrayList<>();
+
+                for (DataSnapshot contactSnapshot : dataSnapshot.getChildren()) {
+                    Contact contact = contactSnapshot.getValue(Contact.class);
+                    if (contact != null) {
+                        allContacts.add(contact);
+                    }
+                }
+
+                listener.onAllContactsFetched(allContacts);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                listener.onAllContactsFetchError(databaseError.getMessage());
+            }
+        });
+    }
+
+    public interface OnAllContactsFetchedListener {
+        void onAllContactsFetched(List<Contact> contacts);
+        void onAllContactsFetchError(String errorMessage);
+    }
+
 
 
 }
