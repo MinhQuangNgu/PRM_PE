@@ -66,11 +66,16 @@ public class FirebaseDatabaseHelper {
 
                 for (DataSnapshot contactSnapshot : dataSnapshot.getChildren()) {
                     Contact contact = contactSnapshot.getValue(Contact.class);
-                    if (contact != null &&
-                            (contact.getFirstName().toLowerCase().contains(searchText.toLowerCase()) ||
-                                    contact.getLastName().toLowerCase().contains(searchText.toLowerCase()) ||
-                                    contact.getEmail().toLowerCase().contains(searchText.toLowerCase()))) {
-                        matchedContacts.add(contact);
+                    if (contact != null) {
+                        String firstName = contact.getFirstName();
+                        String lastName = contact.getLastName();
+                        String email = contact.getEmail();
+
+                        if ((firstName != null && firstName.toLowerCase().contains(searchText.toLowerCase())) ||
+                                (lastName != null && lastName.toLowerCase().contains(searchText.toLowerCase())) ||
+                                (email != null && email.toLowerCase().contains(searchText.toLowerCase()))) {
+                            matchedContacts.add(contact);
+                        }
                     }
                 }
 
