@@ -126,10 +126,12 @@ public class FirebaseDatabaseHelper {
         deleteAllContacts(new OnContactsDeletedListener() {
             @Override
             public void onContactsDeleted() {
-                for (Contact contact : contacts) {
-                    addContact(contact);
+                if(!contacts.isEmpty()) {
+                    for (Contact contact : contacts) {
+                        addContact(contact);
+                    }
+                    listener.onContactsUploaded();
                 }
-                listener.onContactsUploaded();
             }
 
             @Override
