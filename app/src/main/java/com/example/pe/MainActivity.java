@@ -43,6 +43,37 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+
+        // Example
+
+        // Add contacts
+        List<Contact> newContacts = new ArrayList<>();
+        newContacts.add(new Contact(100, "Nguyen", "Cong", "nguyen@gmail.com", "FPT", "0123456789", "FPT", "avata.jpg"));
+        newContacts.add(new Contact(101, "Cong", "Nguyen", "cong@gmail.com", "HN", "0123456789", "FPT", "avata.jpg"));
+        dbHelper.addAllContacts(newContacts, new FirebaseDatabaseHelper.OnContactsAddedListener() {
+            @Override
+            public void onContactsAdded() {
+                Log.d("Contact", "Added.");
+            }
+        });
+
+        String searchText = "Cong";
+        dbHelper.getContactsBySearch(searchText, new FirebaseDatabaseHelper.OnContactsFetchedListener() {
+            @Override
+            public void onContactsFetched(List<Contact> contacts) {
+                for (Contact contact : contacts) {
+                    Log.d("Contact", contact.toString());
+                }
+            }
+
+            @Override
+            public void onContactsFetchError(String errorMessage) {
+                Log.e("ContactFetchError", errorMessage);
+            }
+        });
+
+
+
         findViewById(R.id.btn_add).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -50,5 +81,6 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+
     }
 }
