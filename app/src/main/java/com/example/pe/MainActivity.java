@@ -59,9 +59,23 @@ public class MainActivity extends AppCompatActivity {
                 Log.d("hehe","Id : "+id);
                 (new FirebaseDatabaseHelper()).deleteContact(id);
                 mContactManager.deleteContact(id);
-                contacts.clear();
-                contacts.addAll(getFromLocal());
-                rec.getAdapter().notifyDataSetChanged();
+                dbHelper.getAllContacts(new FirebaseDatabaseHelper.OnAllContactsFetchedListener() {
+                    @Override
+                    public void onAllContactsFetched(List<Contact> contact) {
+//                rec.setAdapter(new ContactCardAdapter(contacts));
+                        contacts.clear();
+                        contacts.addAll(contact);
+                        for (Contact c:contact) {
+                            Log.d("contactCheck2", "onCreate: "+c.toString());
+                        }
+                        rec.getAdapter().notifyDataSetChanged();
+                    }
+
+                    @Override
+                    public void onAllContactsFetchError(String errorMessage) {
+                        Log.e("FirebaseFetchError", errorMessage);
+                    }
+                });
             }
         }));
 
@@ -71,18 +85,21 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this,AddContactActivity.class);
                 startActivity(intent);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
             }
         });
 
         findViewById(R.id.btn_sync).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                contacts = mContactManager.getListContact();
-                if (contacts != null) {
-                    dbHelper.uploadAllContacts(contacts, new FirebaseDatabaseHelper.OnContactsUploadedListener() {
+                if (getFromLocal() != null) {
+                    dbHelper.uploadAllContacts(getFromLocal(), new FirebaseDatabaseHelper.OnContactsUploadedListener() {
                         @Override
                         public void onContactsUploaded() {
                             Toast.makeText(MainActivity.this, "Contacts loaded successfully", Toast.LENGTH_SHORT).show();
+                            contacts.clear();
+                            contacts.addAll(getFromLocal());
+                            rec.getAdapter().notifyDataSetChanged();
                         }
 
                         @Override
@@ -93,6 +110,7 @@ public class MainActivity extends AppCompatActivity {
                 } else {
                     Toast.makeText(MainActivity.this, "No contacts to sync", Toast.LENGTH_SHORT).show();
                 }
+
             }
         });
         findViewById(R.id.btn_search).setOnClickListener(new View.OnClickListener() {
