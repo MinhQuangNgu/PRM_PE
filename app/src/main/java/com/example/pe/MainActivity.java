@@ -26,6 +26,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        mContactManager = new ContactManager(this);
 //        mContactManager = new ContactManager(this);
 //        contacts = mContactManager.getListContact();
 //        for (Contact c:contacts) {
@@ -57,12 +58,11 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void getContact(int id) {
                 Log.d("hehe","Id : "+id);
-                (new FirebaseDatabaseHelper()).deleteContact(id);
+               (new FirebaseDatabaseHelper()).deleteContact(id);
                 mContactManager.deleteContact(id);
                 dbHelper.getAllContacts(new FirebaseDatabaseHelper.OnAllContactsFetchedListener() {
                     @Override
                     public void onAllContactsFetched(List<Contact> contact) {
-//                rec.setAdapter(new ContactCardAdapter(contacts));
                         contacts.clear();
                         contacts.addAll(contact);
                         for (Contact c:contact) {
