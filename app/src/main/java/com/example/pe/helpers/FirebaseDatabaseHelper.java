@@ -32,7 +32,6 @@ public class FirebaseDatabaseHelper {
 
     public void deleteContact(int contactId) {
         databaseReference.child("contacts").child(String.valueOf(contactId)).removeValue();
-        mContactManager.deleteContact(contactId);//xoa tren local
     }
 
     public void getContactById(int contactId, final OnContactByIdFetchedListener listener) {

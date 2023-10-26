@@ -28,7 +28,7 @@ public class MainActivity extends AppCompatActivity {
         dbHelper.getAllContacts(new FirebaseDatabaseHelper.OnAllContactsFetchedListener() {
             @Override
             public void onAllContactsFetched(List<Contact> contacts) {
-                rec.setAdapter(new ContactCardAdapter(contacts));
+//                rec.setAdapter(new ContactCardAdapter(contacts));
             }
 
             @Override
@@ -48,7 +48,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void getContact(int id) {
                 Log.d("hehe","Id : "+id);
-//                (new FirebaseDatabaseHelper()).deleteContact(id);
+                (new FirebaseDatabaseHelper()).deleteContact(id);
                 mContactManager.deleteContact(id);
                 contacts.clear();
                 contacts.addAll(getFromLocal());
