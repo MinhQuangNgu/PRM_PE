@@ -58,6 +58,7 @@ public class ContactManager {
             phones.close();
         }
     }
+
     @SuppressLint("Range")
     private String getFirstName(int contactId) {
         String firstName = null;

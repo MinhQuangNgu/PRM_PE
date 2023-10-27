@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.ContentProviderOperation;
 import android.content.ContentProviderResult;
 import android.content.ContentUris;
+import android.content.Intent;
 import android.content.OperationApplicationException;
 import android.os.Bundle;
 import android.os.RemoteException;
@@ -117,7 +118,9 @@ public class AddContactActivity extends AppCompatActivity {
             final FirebaseDatabaseHelper dbHelper = new FirebaseDatabaseHelper();
             Contact newContact = new Contact(contactId, firstName, lastName, email, address, phone, company, "https://i.pinimg.com/474x/f1/8a/e9/f18ae9cf47240876a977e6071db7f1f2.jpg");
             dbHelper.addContact(newContact);
+            Intent intent =new Intent(AddContactActivity.this, MainActivity.class);
             Toast.makeText(this, "Contact added to phone book", Toast.LENGTH_SHORT).show();
+            startActivity(intent);
         } catch (RemoteException | OperationApplicationException e) {
             e.printStackTrace();
             Toast.makeText(this, "Failed to add contact", Toast.LENGTH_SHORT).show();
