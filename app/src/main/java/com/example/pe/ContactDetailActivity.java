@@ -1,14 +1,15 @@
 package com.example.pe;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 
-import android.content.ContentResolver;
-import android.content.ContentUris;
-import android.content.ContentValues;
+import android.Manifest;
+import android.content.ContentProviderOperation;
 import android.content.Intent;
-import android.database.Cursor;
-import android.net.Uri;
+import android.content.OperationApplicationException;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.os.RemoteException;
 import android.provider.ContactsContract;
 import android.util.Log;
 import android.widget.Button;
@@ -18,6 +19,7 @@ import android.widget.Toast;
 import com.example.pe.entity.Contact;
 import com.example.pe.helpers.FirebaseDatabaseHelper;
 
+import java.util.ArrayList;
 import java.util.Objects;
 
 public class ContactDetailActivity extends AppCompatActivity {
@@ -61,6 +63,7 @@ public class ContactDetailActivity extends AppCompatActivity {
             startActivity(intent);
             return;
         }
+        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_CONTACTS}, PackageManager.PERMISSION_GRANTED);
         dbHelper.getContactById(contactID, new FirebaseDatabaseHelper.OnContactByIdFetchedListener() { // gọi hàm get contact by id trên firebase
             @Override
             public void onContactByIdFetched(Contact contact) {
@@ -91,43 +94,56 @@ public class ContactDetailActivity extends AppCompatActivity {
 
             // Add the contact to the phone book
             addContact(contactID, firstName, lastName, email, company, phone, address);
+
         });
     }
 
     private void addContact(int contactId, String firstName, String lastName, String email, String company, String phone, String address) {
-        ContentResolver contentResolver = getContentResolver();
 
-        //add to firebase
+        ArrayList<ContentProviderOperation> ops = new ArrayList<>();
+
         final FirebaseDatabaseHelper dbHelper = new FirebaseDatabaseHelper();
         Contact newContact = new Contact(contactId, firstName, lastName, email, address, phone, company, "https://i.pinimg.com/474x/f1/8a/e9/f18ae9cf47240876a977e6071db7f1f2.jpg");
         dbHelper.updateContact(newContact);
-        Toast.makeText(this, "Contact added to phone book", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "Contact added to phone book firebase", Toast.LENGTH_SHORT).show();
 
-        Uri contactUri = ContentUris.withAppendedId(ContactsContract.Contacts.CONTENT_URI, contactId);
-        Cursor cursor = contentResolver.query(contactUri, new String[]{ContactsContract.Contacts._ID}, null, null, null);
-
-        if (cursor.getCount() > 0) {
-            ContentValues contentValues = new ContentValues();
-            contentValues.put(ContactsContract.CommonDataKinds.StructuredName.GIVEN_NAME, firstName);
-            contentValues.put(ContactsContract.CommonDataKinds.StructuredName.FAMILY_NAME, lastName);
-            contentValues.put(ContactsContract.CommonDataKinds.Email.DATA, email);
-            contentValues.put(ContactsContract.CommonDataKinds.Organization.COMPANY, company);
-            contentValues.put(ContactsContract.CommonDataKinds.Phone.NUMBER, phone);
-            contentValues.put(ContactsContract.CommonDataKinds.StructuredPostal.FORMATTED_ADDRESS, address);
-
-            int rowsUpdated = contentResolver.update(
-                    contactUri,
-                    contentValues,
-                    null,
-                    null
-            );
-
-            if (rowsUpdated > 0) {
-                Toast.makeText(this, "Contact added to phone book", Toast.LENGTH_SHORT).show();
-            } else {
-                Log.d("ContactUpdater", "Update fail");
-                Toast.makeText(this, "Failed to add contact", Toast.LENGTH_SHORT).show();
-            }
+        ops.add(ContentProviderOperation
+                .newUpdate(ContactsContract.Data.CONTENT_URI)
+                .withSelection(ContactsContract.Data.CONTACT_ID + " = ? ",
+                        new String[]{String.valueOf(contactId)})
+                .withValue(ContactsContract.CommonDataKinds.StructuredName.GIVEN_NAME, firstName)
+                .withValue(ContactsContract.CommonDataKinds.StructuredName.FAMILY_NAME, lastName)
+                .build());
+        ops.add(ContentProviderOperation
+                .newUpdate(ContactsContract.Data.CONTENT_URI)
+                .withSelection(ContactsContract.Data.CONTACT_ID + " = ? ",
+                        new String[]{String.valueOf(contactId)})
+                .withValue(ContactsContract.CommonDataKinds.Organization.COMPANY, company)
+                .build());
+        ops.add(ContentProviderOperation
+                .newUpdate(ContactsContract.Data.CONTENT_URI)
+                .withSelection(ContactsContract.Data.CONTACT_ID + " = ? ",
+                        new String[]{String.valueOf(contactId)})
+                .withValue(ContactsContract.CommonDataKinds.Email.ADDRESS, email)
+                .build());
+        ops.add(ContentProviderOperation
+                .newUpdate(ContactsContract.Data.CONTENT_URI)
+                .withSelection(ContactsContract.Data.CONTACT_ID + " = ? ",
+                        new String[]{String.valueOf(contactId)})
+                .withValue(ContactsContract.CommonDataKinds.Phone.NUMBER, phone)
+                .build());
+        ops.add(ContentProviderOperation
+                .newUpdate(ContactsContract.Data.CONTENT_URI)
+                .withSelection(ContactsContract.Data.CONTACT_ID + " = ? ",
+                        new String[]{String.valueOf(contactId)})
+                .withValue(ContactsContract.CommonDataKinds.StructuredPostal.FORMATTED_ADDRESS, address)
+                .build());
+        try {
+            getContentResolver().applyBatch(ContactsContract.AUTHORITY, ops);
+            Toast.makeText(this, "Contact added to phone book", Toast.LENGTH_SHORT).show();
+        }catch (OperationApplicationException | RemoteException e ){
+            Log.d("ContactUpdater", Objects.requireNonNull(e.getMessage()));
+            Toast.makeText(this, "Failed to add contact", Toast.LENGTH_SHORT).show();
         }
     }
 }
