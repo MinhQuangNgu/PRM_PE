@@ -1,9 +1,11 @@
 package com.example.pe;
 
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,6 +20,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.pe.entity.Contact;
 import com.example.pe.helpers.FirebaseDatabaseHelper;
 
+import java.io.InputStream;
 import java.util.List;
 
 public class ContactCardAdapter extends RecyclerView.Adapter<ContactCardAdapter.ContactCardHolder> {
@@ -51,10 +54,15 @@ public class ContactCardAdapter extends RecyclerView.Adapter<ContactCardAdapter.
         holder.txt_email.setText(contact.email);
         holder.txt_phone.setText(contact.phone);
         String imageUrl = contact.getImageUri();
-        if(imageUrl != null){
+        if (imageUrl != null) {
             try {
-                Bitmap bitmap = BitmapFactory.decodeFile(context.getFilesDir() + "/" + imageUrl);
+                ContentResolver contentResolver = context.getContentResolver();
+                InputStream inputStream = contentResolver.openInputStream(Uri.parse(imageUrl));
+                Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
                 holder.img.setImageBitmap(bitmap);
+                if (inputStream != null) {
+                    inputStream.close();
+                }
             } catch (Exception e) {
                 e.printStackTrace();
             }
