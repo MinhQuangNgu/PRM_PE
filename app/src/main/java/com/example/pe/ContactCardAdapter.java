@@ -54,7 +54,7 @@ public class ContactCardAdapter extends RecyclerView.Adapter<ContactCardAdapter.
         holder.txt_email.setText(contact.email);
         holder.txt_phone.setText(contact.phone);
         String imageUrl = contact.getImageUri();
-        if (imageUrl != null) {
+        if (imageUrl != null && !imageUrl.contains("food_")) {
             try {
                 ContentResolver contentResolver = context.getContentResolver();
                 InputStream inputStream = contentResolver.openInputStream(Uri.parse(imageUrl));
@@ -63,6 +63,14 @@ public class ContactCardAdapter extends RecyclerView.Adapter<ContactCardAdapter.
                 if (inputStream != null) {
                     inputStream.close();
                 }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        else if(imageUrl != null && imageUrl.contains("food_")){
+            try {
+                Bitmap bitmap = BitmapFactory.decodeFile(context.getFilesDir() + "/" + imageUrl);
+                holder.img.setImageBitmap(bitmap);
             } catch (Exception e) {
                 e.printStackTrace();
             }
