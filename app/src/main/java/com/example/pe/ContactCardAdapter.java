@@ -31,6 +31,7 @@ public class ContactCardAdapter extends RecyclerView.Adapter<ContactCardAdapter.
         void getContact(int id);
     }
     public ContactCardAdapter(Context context,List<Contact> contacts , IclickItem iclickItem){
+        this.context = context;
         this.contacts = contacts;
         this.ilickItem = iclickItem;
     }
