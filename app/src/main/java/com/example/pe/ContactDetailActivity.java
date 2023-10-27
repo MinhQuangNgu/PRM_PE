@@ -2,18 +2,12 @@ package com.example.pe;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 
 import android.Manifest;
 import android.content.ContentProviderOperation;
-import android.content.ContentResolver;
-import android.content.ContentUris;
-import android.content.ContentValues;
 import android.content.Intent;
 import android.content.OperationApplicationException;
 import android.content.pm.PackageManager;
-import android.database.Cursor;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.RemoteException;
 import android.provider.ContactsContract;
@@ -106,27 +100,42 @@ public class ContactDetailActivity extends AppCompatActivity {
 
     private void addContact(int contactId, String firstName, String lastName, String email, String company, String phone, String address) {
 
-        ArrayList<ContentProviderOperation> contentProviderOperationArrayList = new ArrayList<>();
+        ArrayList<ContentProviderOperation> ops = new ArrayList<>();
 
         final FirebaseDatabaseHelper dbHelper = new FirebaseDatabaseHelper();
         Contact newContact = new Contact(contactId, firstName, lastName, email, address, phone, company, "https://i.pinimg.com/474x/f1/8a/e9/f18ae9cf47240876a977e6071db7f1f2.jpg");
         dbHelper.updateContact(newContact);
         Toast.makeText(this, "Contact added to phone book firebase", Toast.LENGTH_SHORT).show();
 
-        contentProviderOperationArrayList.add(ContentProviderOperation
+        ops.add(ContentProviderOperation
                 .newUpdate(ContactsContract.Data.CONTENT_URI)
                 .withSelection(ContactsContract.Data.CONTACT_ID + " = ? ",
                         new String[]{String.valueOf(contactId)})
                 .withValue(ContactsContract.CommonDataKinds.StructuredName.GIVEN_NAME, firstName)
                 .withValue(ContactsContract.CommonDataKinds.StructuredName.FAMILY_NAME, lastName)
-                .withValue(ContactsContract.CommonDataKinds.Email.DATA, email)
-                .withValue(ContactsContract.CommonDataKinds.Organization.COMPANY, company)
-                .withValue(ContactsContract.CommonDataKinds.Phone.NUMBER, phone)
-                .withValue(ContactsContract.CommonDataKinds.Phone.TYPE, ContactsContract.CommonDataKinds.Phone.TYPE_MOBILE)
+                .build());
+//        ops.add(ContentProviderOperation
+//                .newUpdate(ContactsContract.Data.CONTENT_URI)
+//                .withSelection(ContactsContract.Data.CONTACT_ID + " = ? ",
+//                        new String[]{String.valueOf(contactId)})
+//                .withValue(ContactsContract.CommonDataKinds.StructuredName.GIVEN_NAME, firstName)
+//                .withValue(ContactsContract.CommonDataKinds.StructuredName.FAMILY_NAME, lastName)
+//                .withValue(ContactsContract.CommonDataKinds.Email.DATA, email)
+//                .withValue(ContactsContract.CommonDataKinds.Organization.COMPANY, company)
+//                .withValue(ContactsContract.CommonDataKinds.Phone.NUMBER, phone)
+//                .withValue(ContactsContract.CommonDataKinds.Phone.TYPE, ContactsContract.CommonDataKinds.Phone.TYPE_MOBILE)
+//                .withValue(ContactsContract.CommonDataKinds.StructuredPostal.FORMATTED_ADDRESS, address)
+//                .build());
+
+        // Add the contact's address
+        ops.add(ContentProviderOperation.newInsert(ContactsContract.Data.CONTENT_URI)
+                .withValueBackReference(ContactsContract.Data.RAW_CONTACT_ID, 0)
+                .withValue(ContactsContract.Data.MIMETYPE, ContactsContract.CommonDataKinds.StructuredPostal.CONTENT_ITEM_TYPE)
                 .withValue(ContactsContract.CommonDataKinds.StructuredPostal.FORMATTED_ADDRESS, address)
+                .withValue(ContactsContract.CommonDataKinds.StructuredPostal.TYPE, ContactsContract.CommonDataKinds.StructuredPostal.TYPE_HOME)
                 .build());
         try {
-            getContentResolver().applyBatch(ContactsContract.AUTHORITY, contentProviderOperationArrayList);
+            getContentResolver().applyBatch(ContactsContract.AUTHORITY, ops);
             Toast.makeText(this, "Contact added to phone book", Toast.LENGTH_SHORT).show();
         }catch (OperationApplicationException | RemoteException e ){
             Log.d("ContactUpdater", Objects.requireNonNull(e.getMessage()));
