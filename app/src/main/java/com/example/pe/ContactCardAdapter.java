@@ -1,6 +1,11 @@
 package com.example.pe;
 
+import android.content.ContentResolver;
+import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,17 +20,21 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.pe.entity.Contact;
 import com.example.pe.helpers.FirebaseDatabaseHelper;
 
+import java.io.InputStream;
 import java.util.List;
 
 public class ContactCardAdapter extends RecyclerView.Adapter<ContactCardAdapter.ContactCardHolder> {
 
     List<Contact> contacts;
+
+    private Context context;
     private IclickItem ilickItem;
 
     public interface IclickItem{
         void getContact(int id);
     }
-    public ContactCardAdapter(List<Contact> contacts , IclickItem iclickItem){
+    public ContactCardAdapter(Context context,List<Contact> contacts , IclickItem iclickItem){
+        this.context = context;
         this.contacts = contacts;
         this.ilickItem = iclickItem;
     }
@@ -44,6 +53,20 @@ public class ContactCardAdapter extends RecyclerView.Adapter<ContactCardAdapter.
         holder.txt_name.setText(contact.firstName + " " + contact.lastName);
         holder.txt_email.setText(contact.email);
         holder.txt_phone.setText(contact.phone);
+        String imageUrl = contact.getImageUri();
+        if (imageUrl != null) {
+            try {
+                ContentResolver contentResolver = context.getContentResolver();
+                InputStream inputStream = contentResolver.openInputStream(Uri.parse(imageUrl));
+                Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
+                holder.img.setImageBitmap(bitmap);
+                if (inputStream != null) {
+                    inputStream.close();
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
         holder.btn_delete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -80,6 +103,7 @@ public class ContactCardAdapter extends RecyclerView.Adapter<ContactCardAdapter.
             txt_phone = itemView.findViewById(R.id.txt_phone);
             btn_edit = itemView.findViewById(R.id.btn_edit);
             btn_delete = itemView.findViewById(R.id.btn_delete);
+            img = itemView.findViewById(R.id.card_img);
         }
     }
 }

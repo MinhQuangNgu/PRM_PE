@@ -51,7 +51,6 @@ public class ContactManager {
                 String imageURI = phones.getString(imageURIIndex);
                 Bitmap photo = getPhotoURI(imageURI);
                 mListContact.add(new Contact(id, firstName, lastName, email, address, phone, company, imageURI));
-
                 Log.d("checkgetAll", "getContactData: " + (new Contact(id, firstName, lastName, email, address, phone, company, imageURI)));
             }
 
