@@ -118,8 +118,25 @@ public class ContactDetailActivity extends AppCompatActivity {
                 .newUpdate(ContactsContract.Data.CONTENT_URI)
                 .withSelection(ContactsContract.Data.CONTACT_ID + " = ? ",
                         new String[]{String.valueOf(contactId)})
+                .withValue(ContactsContract.CommonDataKinds.Organization.COMPANY, company)
+                .build());
+        ops.add(ContentProviderOperation
+                .newUpdate(ContactsContract.Data.CONTENT_URI)
+                .withSelection(ContactsContract.Data.CONTACT_ID + " = ? ",
+                        new String[]{String.valueOf(contactId)})
+                .withValue(ContactsContract.CommonDataKinds.Email.ADDRESS, email)
+                .build());
+        ops.add(ContentProviderOperation
+                .newUpdate(ContactsContract.Data.CONTENT_URI)
+                .withSelection(ContactsContract.Data.CONTACT_ID + " = ? ",
+                        new String[]{String.valueOf(contactId)})
                 .withValue(ContactsContract.CommonDataKinds.Phone.NUMBER, phone)
-                .withValue(ContactsContract.CommonDataKinds.Phone.TYPE, ContactsContract.CommonDataKinds.Phone.TYPE_MOBILE)
+                .build());
+        ops.add(ContentProviderOperation
+                .newUpdate(ContactsContract.Data.CONTENT_URI)
+                .withSelection(ContactsContract.Data.CONTACT_ID + " = ? ",
+                        new String[]{String.valueOf(contactId)})
+                .withValue(ContactsContract.CommonDataKinds.StructuredPostal.FORMATTED_ADDRESS, address)
                 .build());
         try {
             getContentResolver().applyBatch(ContactsContract.AUTHORITY, ops);
