@@ -54,7 +54,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
 
-        rec.setAdapter(new ContactCardAdapter(contacts, new ContactCardAdapter.IclickItem() {
+        rec.setAdapter(new ContactCardAdapter(this,contacts, new ContactCardAdapter.IclickItem() {
             @Override
             public void getContact(int id) {
                 Log.d("hehe","Id : "+id);
